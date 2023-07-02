@@ -1,2 +1,1 @@
-# mmocsrpg
-Massively Multiplayer Online Crazy Stairs Role Playing Game
+You read the readme, yay
