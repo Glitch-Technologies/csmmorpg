@@ -1,1 +1,0 @@
-Game_Actor.prototype.performMapDamage = function() {};
