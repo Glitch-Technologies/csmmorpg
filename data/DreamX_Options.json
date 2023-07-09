@@ -1,0 +1,27 @@
+{
+    "VIDEO": {
+        "816x624": {
+            "w": "816",
+            "h": "624"
+        }
+    },
+    "VARIABLES": {
+        "18": {
+            "step": "1",
+            "min": "0",
+            "max": "10"
+        }
+    },
+    "HELP_TEXT": {
+        "alwaysDash": "If on, always dash even without holding dash button.",
+        "commandRemember": "Remembers what was selected in battle.",
+        "bgmVolume": "This changes the volume of bg music.",
+        "bgsVolume": "This changes the volume of bg sound.",
+        "meVolume": "This changes the volume of message sound effects.",
+        "seVolume": "This changes the volume of sound effects.",
+        "resolution": "Requires exit and restart.",
+        "fullscreen": "Toggle Fullscreen.",
+        "switch_351": "Causes Red Orbs to stop giving free healing.",
+        "variable_18": "The amount of fun you'll have while playing."
+    }
+}
