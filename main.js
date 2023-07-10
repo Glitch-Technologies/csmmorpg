@@ -2,6 +2,8 @@ tilemaps = {}
 
 function draw() {
     const canvas = document.getElementById("canvas");
+    var w = canvas.width;
+    var h = canvas.height;
     if (canvas.getContext) {
     
         const ctx = canvas.getContext("2d");
@@ -22,31 +24,53 @@ function draw() {
         
         img.onload = () => {
             //ctx.drawImage(img, 0, 0);
-            console.log("0");
+            //console.log("0");
         }
         img.src = "img/titles/title.png";
+        renderMap(1,w,h,ctx,"myimage.png");
 
     }
   }
 
-function renderMap(tilemap) {
-    if (!("tilemap" in tilemaps)) {
-        loadMap(tilemap)
+function renderMap(tilemap, width, height, ctx, src) {
+    if (!(tilemap in tilemaps)) {
+        loadMap(tilemap);
     }
+    ctx.fillStyle = "black";
+    ctx.font = "8px serif";
+    //bitmapPath = "tilesets/"+tilemaps[tilemap]["metadata"]["tileset"]+".png";
+    for(var x=0; x<1280; x+=16) {
+        for(var y=0; y<720; y+=16) {
+            const tileX = x
+            const tileY = y
+            const tile = new Image(16, 16);
+            
+            //const tile2 = createImageBitmap(bitmapPath, tileX, tileY, 48, 48)
+            tile.src = src;
+            
+            //console.log(tileX)
+            tile.onload = () => {ctx.drawImage(tile, tileX, tileY);ctx.fillText((tileY/16), tileX, tileY, 16, 16);};
+            
+        } 
+    }
+    
     
 
 }
 
 function loadMap(tilemap) {
-    tilemaps[tilemap.toString] = fetchMap(tilemap);
+    tilemaps[tilemap] = JSON.parse(fetchMap(tilemap));
 }
 
-const fetchMap = async(tilemap) => {
+function fetchMap(tilemap) {
     tilemapint = (tilemap).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
     tilemapPath = "tilemaps/map" + tilemapint + ".json";
-    tilemapdata = await getJSON(tilemapPath);
-    console.log("GET: " + JSON.stringify(tilemapdata["metadata"]));
-    return tilemapdata;
+    altGetJSON(tilemapPath);
+    console.log("GET: " + localStorage.getItem("temp"))
+    return localStorage.getItem("temp");
+    /*const tilemapdata = await getJSON(tilemapPath);
+    console.log("GET: " + JSON.stringify(tilemapdata));
+    return tilemapdata;*/
 }
 
 const getJSON = async(path) => {
@@ -55,6 +79,15 @@ const getJSON = async(path) => {
     return json;
 }
 
-renderMap(0)
-console.log(tilemaps);
+function altGetJSON(path) {
+    let iterator = fetch(path);
+    iterator
+    .then(response => response.json())
+    .then(post => JSON.stringify(post))
+    .then(text => localStorage.setItem("temp", text));;;
+    //localStorage.setItem("temp", post)
+}
+
+
 draw();
+console.log(tilemaps[1]["metadata"]);
