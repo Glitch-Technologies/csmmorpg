@@ -1,3 +1,5 @@
+tilemaps = {}
+
 function draw() {
     const canvas = document.getElementById("canvas");
     if (canvas.getContext) {
@@ -20,7 +22,7 @@ function draw() {
         
         img.onload = () => {
             //ctx.drawImage(img, 0, 0);
-            console.log("0")
+            console.log("0");
         }
         img.src = "img/titles/title.png";
 
@@ -28,7 +30,31 @@ function draw() {
   }
 
 function renderMap(tilemap) {
+    if (!("tilemap" in tilemaps)) {
+        loadMap(tilemap)
+    }
     
+
 }
 
-  draw();
+function loadMap(tilemap) {
+    tilemaps[tilemap.toString] = fetchMap(tilemap);
+}
+
+const fetchMap = async(tilemap) => {
+    tilemapint = (tilemap).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
+    tilemapPath = "tilemaps/map" + tilemapint + ".json";
+    tilemapdata = await getJSON(tilemapPath);
+    console.log("GET: " + JSON.stringify(tilemapdata["metadata"]));
+    return tilemapdata;
+}
+
+const getJSON = async(path) => {
+    const response = await fetch(path);
+    const json = await response.json();
+    return json;
+}
+
+renderMap(0)
+console.log(tilemaps);
+draw();
