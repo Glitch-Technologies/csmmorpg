@@ -1,6 +1,6 @@
 tilemaps = {}
-
-function draw() {
+tiles = {}
+async function draw() {
     const canvas = document.getElementById("canvas");
     var w = canvas.width;
     var h = canvas.height;
@@ -8,54 +8,81 @@ function draw() {
     
         const ctx = canvas.getContext("2d");
         
-        ctx.rect(0, 0, 1280, 720);
-        ctx.fillStyle = "black";
-        ctx.fill();
+        const skybox = new Image();
+        skybox.src = "img/battlebacks/skybox.png";
 
-
-        ctx.fillStyle = "rgb(200, 0, 0)";
-        ctx.fillRect(10, 10, 50, 50);
-
-        ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-        ctx.fillRect(30, 30, 50, 50);
-        
-        
-        const img = new Image(100,100);
-        
-        img.onload = () => {
-            //ctx.drawImage(img, 0, 0);
-            //console.log("0");
+        skybox.onload = () => {
+            ctx.drawImage(skybox, 0, 0, w, h);
+            
+            
+            const img = new Image(100,100);
+            
+            img.onload = () => {
+                //ctx.drawImage(img, 0, 0);
+                //console.log("0");
+            }
+            img.src = "img/titles/title.png";
+            renderMap(0,w,h,ctx,0,0);
+            
         }
-        img.src = "img/titles/title.png";
-        renderMap(1,w,h,ctx,"myimage.png");
 
     }
-  }
+}
 
-function renderMap(tilemap, width, height, ctx, src) {
+function watermark(ctx) {
+    ctx.fillStyle = "rgb(200, 0, 0)";
+    ctx.fillRect(10, 10, 50, 50);
+
+    ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+    ctx.fillRect(30, 30, 50, 50);
+}
+
+async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
     if (!(tilemap in tilemaps)) {
         loadMap(tilemap);
     }
     ctx.fillStyle = "black";
-    ctx.font = "8px serif";
-    //bitmapPath = "tilesets/"+tilemaps[tilemap]["metadata"]["tileset"]+".png";
-    for(var x=0; x<1280; x+=16) {
-        for(var y=0; y<720; y+=16) {
-            const tileX = x
-            const tileY = y
-            const tile = new Image(16, 16);
-            
-            //const tile2 = createImageBitmap(bitmapPath, tileX, tileY, 48, 48)
-            tile.src = src;
-            
+    ctx.font = "16px serif";
+    bitmapPath = "tilesets/"+tilemaps[tilemap]["metadata"]["tileset"]+".png";
+    xOff = 16
+    yOff = 24
+    vRows = 26
+    vCols = 14
+    const hexToDecimal = hex => parseInt(hex, 16);
+    for(var y=0; y<vCols; y++) {
+        for(var x=0; x<vRows; x++) {
+            const cX = x
+            const cY = y
+            const tileX = x*48+xOff;
+            const tileY = y*48+yOff;
+            const mapWidth = tilemaps[tilemap]["metadata"]["width"]
+            const mapHeight = tilemaps[tilemap]["metadata"]["height"]
+            const mapX = (cameraX + cX)
+            const mapY = (cameraY + cY)
+            const mapPos = mapX + mapY*mapWidth
+            const tileIndex = hexToDecimal(tilemaps[tilemap]["map"][mapPos]);
+            //console.log(mapPos);
+            //console.log(hexToDecimal(tileIndex))
             //console.log(tileX)
-            tile.onload = () => {ctx.drawImage(tile, tileX, tileY);ctx.fillText((tileY/16), tileX, tileY, 16, 16);};
+            //tile.onload = () => {ctx.drawImage(tile, tileX, tileY);ctx.fillText((tileY/16), tileX, tileY, 16, 16);};
+            if( !(mapX>=mapWidth) && !(mapY>=mapHeight) ) {
+                loadTile(tileIndex, bitmapPath)
+                ctx.drawImage(await tiles[tileIndex], tileX, tileY);
+            }
             
         } 
     }
+    watermark(ctx);
     
     
 
+}
+
+function loadTile(tileIndex, bitmapPath) {
+    const bitmap = new Image();
+    bitmap.src = bitmapPath;
+    
+    tiles[tileIndex] = createImageBitmap(bitmap, (tileIndex%16)*48, Math.trunc(tileIndex/16)*48, 48, 48)
 }
 
 function loadMap(tilemap) {
@@ -90,4 +117,3 @@ function altGetJSON(path) {
 
 
 draw();
-console.log(tilemaps[1]["metadata"]);
