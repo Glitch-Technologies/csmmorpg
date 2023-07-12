@@ -1,7 +1,19 @@
+/* Todo:
+- Add forced timeout for all image loading in case of network failure on user end.
+*/
+
 const tilemaps = {}
 const tiles = {}
+const players = {}
 flag = false;
 
+const player = {
+    username: "Noob", 
+    x: 0,
+    y: 0,
+};
+
+players[player.username] = player;
 
 async function draw() {
     const canvas = document.getElementById("canvas");
@@ -25,10 +37,8 @@ async function draw() {
                 //console.log("0");
             }
             img.src = "img/titles/title.png";
-            renderMap(0,w,h,ctx,0,0);
-            
+            renderMap(0,w,h,ctx,0,0);            
         }
-
     }
 }
 
@@ -74,13 +84,19 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
                 }
                 ctx.drawImage(await tiles[tileIndex], tileX, tileY);
             }
-            
         } 
     }
+    
+    playersList = Object.keys(players);
+    for(var c=0; c<playersList.length; c++) {
+        const playerSprite = new Image(16,16);
+        playerSprite.src = "player.png";
+        const playerKey = playersList[c];
+        const playerDrawn = players[playerKey]
+        console.log(playerDrawn)
+        playerSprite.onload = () => {ctx.drawImage(playerSprite, playerDrawn.x, playerDrawn.y, 48, 48)}
+    }
     watermark(ctx);
-    
-    
-
 }
 
 function loadTile(tileIndex, bitmapPath) {
