@@ -1,5 +1,8 @@
-tilemaps = {}
-tiles = {}
+const tilemaps = {}
+const tiles = {}
+flag = false;
+
+
 async function draw() {
     const canvas = document.getElementById("canvas");
     var w = canvas.width;
@@ -66,7 +69,9 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
             //console.log(tileX)
             //tile.onload = () => {ctx.drawImage(tile, tileX, tileY);ctx.fillText((tileY/16), tileX, tileY, 16, 16);};
             if( !(mapX>=mapWidth) && !(mapY>=mapHeight) ) {
-                loadTile(tileIndex, bitmapPath)
+                if (!(tileIndex in tiles)) {
+                    loadTile(tileIndex, bitmapPath)
+                }
                 ctx.drawImage(await tiles[tileIndex], tileX, tileY);
             }
             
@@ -79,10 +84,21 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
 }
 
 function loadTile(tileIndex, bitmapPath) {
-    const bitmap = new Image();
+    const bitmap = new Image(768,768);
     bitmap.src = bitmapPath;
+    const t = setInterval(function(){flag = bitmap.complete},1000);
+    checkFlag(tileIndex, bitmap);
+    tiles[tileIndex] = createImageBitmap(bitmap, (tileIndex%16)*48, Math.trunc(tileIndex/16)*48, 48, 48);
+    flag = false;
     
-    tiles[tileIndex] = createImageBitmap(bitmap, (tileIndex%16)*48, Math.trunc(tileIndex/16)*48, 48, 48)
+}
+
+function checkFlag() {
+    if(flag === false) {
+       window.setTimeout(checkFlag, 100); /* this checks the flag every 100 milliseconds*/
+    } else {
+        return
+    }
 }
 
 function loadMap(tilemap) {
@@ -95,9 +111,6 @@ function fetchMap(tilemap) {
     altGetJSON(tilemapPath);
     console.log("GET: " + localStorage.getItem("temp"))
     return localStorage.getItem("temp");
-    /*const tilemapdata = await getJSON(tilemapPath);
-    console.log("GET: " + JSON.stringify(tilemapdata));
-    return tilemapdata;*/
 }
 
 const getJSON = async(path) => {
@@ -112,7 +125,6 @@ function altGetJSON(path) {
     .then(response => response.json())
     .then(post => JSON.stringify(post))
     .then(text => localStorage.setItem("temp", text));;;
-    //localStorage.setItem("temp", post)
 }
 
 
