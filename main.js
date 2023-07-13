@@ -5,7 +5,9 @@
 const tilemaps = {}
 const tiles = {}
 const players = {}
-flag = false;
+var flag = false;
+var mapWidth = 0;
+var mapHeight = 0;
 
 const player = {
     username: "Noob", 
@@ -15,30 +17,39 @@ const player = {
 
 players[player.username] = player;
 
-async function draw() {
-    const canvas = document.getElementById("canvas");
-    var w = canvas.width;
-    var h = canvas.height;
-    if (canvas.getContext) {
-    
-        const ctx = canvas.getContext("2d");
-        
-        const skybox = new Image();
-        skybox.src = "img/battlebacks/skybox.png";
+const canvas = document.getElementById("canvas");
+var w = canvas.width;
+var h = canvas.height;
+const ctx = canvas.getContext("2d");
 
-        skybox.onload = () => {
-            ctx.drawImage(skybox, 0, 0, w, h);
-            
-            
-            const img = new Image(100,100);
-            
-            img.onload = () => {
-                //ctx.drawImage(img, 0, 0);
-                //console.log("0");
-            }
-            img.src = "img/titles/title.png";
-            renderMap(0,w,h,ctx,0,0);            
+speed = 8;
+moveDelay = 100;
+moveTimeout = 0;
+setInterval(function () {
+    if (moveTimeout>0) {
+        moveTimeout-=100;
+    }
+}, 100);
+
+
+
+async function draw() {
+    const skybox = new Image();
+    skybox.src = "img/battlebacks/skybox.png";
+
+    skybox.onload = () => {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(skybox, 0, 0, w, h);
+        
+        
+        const img = new Image(100,100);
+        
+        img.onload = () => {
+            //ctx.drawImage(img, 0, 0);
+            //console.log("0");
         }
+        img.src = "img/titles/title.png";
+        renderMap(1,w,h,ctx,0,0);            
     }
 }
 
@@ -68,8 +79,8 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
             const cY = y
             const tileX = x*48+xOff;
             const tileY = y*48+yOff;
-            const mapWidth = tilemaps[tilemap]["metadata"]["width"]
-            const mapHeight = tilemaps[tilemap]["metadata"]["height"]
+            mapWidth = tilemaps[tilemap]["metadata"]["width"]
+            mapHeight = tilemaps[tilemap]["metadata"]["height"]
             const mapX = (cameraX + cX)
             const mapY = (cameraY + cY)
             const mapPos = mapX + mapY*mapWidth
@@ -93,8 +104,8 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
         playerSprite.src = "player.png";
         const playerKey = playersList[c];
         const playerDrawn = players[playerKey]
-        console.log(playerDrawn)
-        playerSprite.onload = () => {ctx.drawImage(playerSprite, playerDrawn.x, playerDrawn.y, 48, 48)}
+        //console.log(playerDrawn)
+        playerSprite.onload = () => {ctx.drawImage(playerSprite, playerDrawn.x*48+xOff, playerDrawn.y*48+yOff, 48, 48)}
     }
     watermark(ctx);
 }
@@ -102,7 +113,7 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
 function loadTile(tileIndex, bitmapPath) {
     const bitmap = new Image(768,768);
     bitmap.src = bitmapPath;
-    const t = setInterval(function(){flag = bitmap.complete},1000);
+    const t = setInterval(function(){flag = bitmap.complete},10);
     checkFlag(tileIndex, bitmap);
     tiles[tileIndex] = createImageBitmap(bitmap, (tileIndex%16)*48, Math.trunc(tileIndex/16)*48, 48, 48);
     flag = false;
@@ -122,8 +133,8 @@ function loadMap(tilemap) {
 }
 
 function fetchMap(tilemap) {
-    tilemapint = (tilemap).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
-    tilemapPath = "tilemaps/map" + tilemapint + ".json";
+    tilemapInt = (tilemap).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})
+    tilemapPath = "tilemaps/map" + tilemapInt + ".json";
     altGetJSON(tilemapPath);
     console.log("GET: " + localStorage.getItem("temp"))
     return localStorage.getItem("temp");
@@ -143,5 +154,40 @@ function altGetJSON(path) {
     .then(text => localStorage.setItem("temp", text));;;
 }
 
+/* Use to debug new keypress ids
+document.addEventListener('keypress', (event) => {
+    var name = event.key;
+    var code = event.code;
+    // Alert the key name and key code on keydown
+    alert(`Key pressed ${name} \r\n Key code value: ${code}`);
+}, false);
+*/
+
+window.addEventListener("keydown", function(event) {
+    if (event.defaultPrevented) {
+      return;
+    }
+    if(moveTimeout === 0) {
+        if ((event.code === "ArrowDown" || event.code === "KeyS") && player.y<mapHeight){
+            player.y++;
+            moveTimeout+=moveDelay
+            draw();
+        } else if ((event.code === "ArrowUp" || event.code === "KeyW") && player.y>0){
+            player.y--;
+            moveTimeout+=moveDelay
+            draw();
+        } else if ((event.code === "ArrowLeft" || event.code === "KeyA") && player.x>0){
+            player.x--;
+            moveTimeout+=moveDelay
+            draw();
+        } else if ((event.code === "ArrowRight" || event.code === "KeyD") && player.x<mapWidth){
+            player.x++;
+            moveTimeout+=moveDelay
+            draw();
+        }
+    }
+    
+    event.preventDefault();
+  }, true);
 
 draw();
