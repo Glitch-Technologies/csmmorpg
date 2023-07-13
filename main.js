@@ -18,7 +18,14 @@ const player = {
     y: 0,
 };
 
+const player2 = {
+    username: "Chuck", 
+    x: 5,
+    y: 5,
+}
+
 players[player.username] = player;
+players[player2.username] = player2;
 
 const canvas = document.getElementById("canvas");
 var w = canvas.width;
@@ -97,9 +104,14 @@ async function renderMap(tilemap, width, height, ctx, cameraX, cameraY) {
         const playerSprite = new Image(16,16);
         playerSprite.src = "player.png";
         const playerKey = playersList[c];
+        player.username = document.getElementById('playerName').value
+        console.log(document.getElementById('playerName').value)
         const playerDrawn = players[playerKey]
         //console.log(playerDrawn)
-        playerSprite.onload = () => {ctx.drawImage(playerSprite, playerDrawn.x*48+xOff, playerDrawn.y*48+yOff, 48, 48)}
+        playerSprite.onload = () => {
+            ctx.drawImage(playerSprite, playerDrawn.x*48+xOff, playerDrawn.y*48+yOff, 48, 48)
+            ctx.fillText(playerDrawn.username,  playerDrawn.x*48+xOff+2, playerDrawn.y*48+yOff-2);
+        }
     }
     watermark(ctx);
 }
@@ -109,6 +121,7 @@ function loadTile(tileIndex, bitmapPath) {
     bitmap.src = bitmapPath;
     const t = setInterval(function(){flag = bitmap.complete},10);
     checkFlag(tileIndex, bitmap);
+    console.log(bitmap.complete)
     tiles[tileIndex] = createImageBitmap(bitmap, (tileIndex%16)*48, Math.trunc(tileIndex/16)*48, 48, 48);
     flag = false;
     
@@ -164,8 +177,8 @@ document.addEventListener('keypress', (event) => {
     alert(`Key pressed ${name} \r\n Key code value: ${code}`);
 }, false);
 */
-
-window.addEventListener("keydown", function(event) {
+const canvasWindow = document.getElementById('canvas');
+canvas.addEventListener("keydown", function(event) {
     if (event.defaultPrevented) {
       return;
     }
@@ -194,6 +207,11 @@ window.addEventListener("keydown", function(event) {
     }
     
     event.preventDefault();
-  }, true);
+}, true);
+
+function updatePlayers() {
+    
+}
+
 
 drawTitle();
