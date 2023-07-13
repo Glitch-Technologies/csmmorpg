@@ -49,7 +49,7 @@ async function draw() {
             //console.log("0");
         }
         img.src = "img/titles/title.png";
-        renderMap(1,w,h,ctx,0,0);            
+        renderMap(0,w,h,ctx,0,0);            
     }
 }
 
@@ -168,7 +168,7 @@ window.addEventListener("keydown", function(event) {
       return;
     }
     if(moveTimeout === 0) {
-        if ((event.code === "ArrowDown" || event.code === "KeyS") && player.y<mapHeight){
+        if ((event.code === "ArrowDown" || event.code === "KeyS") && player.y<mapHeight-1){
             player.y++;
             moveTimeout+=moveDelay
             draw();
@@ -180,7 +180,7 @@ window.addEventListener("keydown", function(event) {
             player.x--;
             moveTimeout+=moveDelay
             draw();
-        } else if ((event.code === "ArrowRight" || event.code === "KeyD") && player.x<mapWidth){
+        } else if ((event.code === "ArrowRight" || event.code === "KeyD") && player.x<mapWidth-1){
             player.x++;
             moveTimeout+=moveDelay
             draw();
