@@ -8,6 +8,8 @@ const players = {}
 var flag = false;
 var mapWidth = 0;
 var mapHeight = 0;
+var startFlag = false;
+
 
 const player = {
     username: "Noob", 
@@ -21,6 +23,7 @@ const canvas = document.getElementById("canvas");
 var w = canvas.width;
 var h = canvas.height;
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 
 speed = 8;
 moveDelay = 100;
@@ -38,17 +41,7 @@ async function draw() {
     skybox.src = "img/battlebacks/skybox.png";
 
     skybox.onload = () => {
-        ctx.imageSmoothingEnabled = false;
         ctx.drawImage(skybox, 0, 0, w, h);
-        
-        
-        const img = new Image(100,100);
-        
-        img.onload = () => {
-            //ctx.drawImage(img, 0, 0);
-            //console.log("0");
-        }
-        img.src = "img/titles/title.png";
         renderMap(0,w,h,ctx,0,0);            
     }
 }
@@ -154,6 +147,14 @@ function altGetJSON(path) {
     .then(text => localStorage.setItem("temp", text));;;
 }
 
+function drawTitle() {
+    const img = new Image();
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0, w, h);
+    }
+    img.src = "img/titles/title.png";
+}
+
 /* Use to debug new keypress ids
 document.addEventListener('keypress', (event) => {
     var name = event.key;
@@ -166,6 +167,10 @@ document.addEventListener('keypress', (event) => {
 window.addEventListener("keydown", function(event) {
     if (event.defaultPrevented) {
       return;
+    }
+    if(startFlag==false) {
+        startFlag=true;
+        draw();
     }
     if(moveTimeout === 0) {
         if ((event.code === "ArrowDown" || event.code === "KeyS") && player.y<mapHeight-1){
@@ -190,4 +195,4 @@ window.addEventListener("keydown", function(event) {
     event.preventDefault();
   }, true);
 
-draw();
+drawTitle();
