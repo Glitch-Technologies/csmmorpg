@@ -1,5 +1,6 @@
 /* Todo:
 - Add forced timeout for all image loading in case of network failure on user end.
+- Fix not waiting for some things
 */
 
 const tilemaps = {}
