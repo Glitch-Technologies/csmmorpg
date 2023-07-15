@@ -37,7 +37,7 @@ def get_query(query):
         values.append(pair[1])
     return dict(zip(keys, values))
 
-class csmmorpgServer(BaseHTTPRequestHandler):
+class csServer(BaseHTTPRequestHandler):
     def do_GET(self):
         p = self.path.split("?")[0]
         # Refer to p[0] for get path
@@ -76,7 +76,7 @@ class csmmorpgServer(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    webServer = HTTPServer((hostName, serverPort), csmmorpgServer)
+    webServer = HTTPServer((hostName, serverPort), csServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
 
     try:
